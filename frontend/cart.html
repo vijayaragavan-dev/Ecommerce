@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart - ShopLux</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <div class="loading-overlay hidden" id="loadingOverlay">
+        <div class="loader"></div>
+    </div>
+
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <span class="logo-icon"><i class="fas fa-gem"></i></span>
+                <span class="logo-text">ShopLux</span>
+            </a>
+            
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Search products..." id="searchInput">
+                <button class="search-btn" onclick="performSearch()">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+            
+            <div class="nav-icons">
+                <a href="cart.html" class="nav-icon cart-icon">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span class="cart-badge" id="cartBadge">0</span>
+                </a>
+                <div class="user-menu" id="userMenu">
+                    <a href="login.html" class="nav-icon" id="loginBtn">
+                        <i class="fas fa-user"></i>
+                    </a>
+                    <div class="user-dropdown" id="userDropdown" style="display: none;">
+                        <a href="#" id="userNameDisplay"></a>
+                        <a href="admin.html" id="adminLink" style="display: none;">Admin Panel</a>
+                        <a href="#" onclick="logout()">Logout</a>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="index.html" class="mobile-link">Home</a>
+            <a href="products.html" class="mobile-link">Products</a>
+            <a href="cart.html" class="mobile-link">Cart</a>
+            <a href="login.html" class="mobile-link">Login</a>
+        </div>
+    </nav>
+
+    <div class="page-header">
+        <div class="container">
+            <h1>Shopping Cart</h1>
+            <p>Review your items before checkout</p>
+        </div>
+    </div>
+
+    <section class="cart-page">
+        <div class="container">
+            <div class="cart-layout" id="cartLayout">
+                <div class="cart-items" id="cartItems">
+                    <!-- Cart items loaded dynamically -->
+                </div>
+                
+                <div class="cart-summary" id="cartSummary">
+                    <h3>Order Summary</h3>
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span id="cartSubtotal">$0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Shipping</span>
+                        <span>Free</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Tax</span>
+                        <span id="cartTax">$0.00</span>
+                    </div>
+                    <div class="summary-divider"></div>
+                    <div class="summary-row total">
+                        <span>Total</span>
+                        <span id="cartTotal">$0.00</span>
+                    </div>
+                    <button class="checkout-btn" onclick="proceedToCheckout()">
+                        Proceed to Checkout
+                    </button>
+                    <a href="products.html" class="continue-shopping">
+                        <i class="fas fa-arrow-left"></i> Continue Shopping
+                    </a>
+                </div>
+            </div>
+            
+            <div class="empty-cart" id="emptyCart" style="display: none;">
+                <div class="empty-cart-icon">
+                    <i class="fas fa-shopping-bag"></i>
+                </div>
+                <h2>Your cart is empty</h2>
+                <p>Looks like you haven't added any items to your cart yet.</p>
+                <a href="products.html" class="cta-btn">Start Shopping</a>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h3>ShopLux</h3>
+                    <p>Your destination for premium products</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="products.html">Products</a></li>
+                        <li><a href="cart.html">Cart</a></li>
+                        <li><a href="login.html">Login</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Categories</h4>
+                    <ul>
+                        <li><a href="products.html?category=Electronics">Electronics</a></li>
+                        <li><a href="products.html?category=Clothing">Clothing</a></li>
+                        <li><a href="products.html?category=Accessories">Accessories</a></li>
+                        <li><a href="products.html?category=Sportswear">Sportswear</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Contact Us</h4>
+                    <ul>
+                        <li><i class="fas fa-envelope"></i> support@shoplux.com</li>
+                        <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Commerce St</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 ShopLux. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="js/loader.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        function hideLoading() { LoadingManager.hide(); }
+        function showLoading() { LoadingManager.show(); }
+        
+        let cartItems = [];
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCart();
+            updateCartBadge();
+            checkAuth();
+        });
+        
+        function loadCart() {
+            const token = localStorage.getItem('token');
+            
+            if (!token) {
+                showEmptyCart();
+                return;
+            }
+            
+            fetchAPI('/api/cart', 'GET')
+                .then(items => {
+                    cartItems = items;
+                    displayCart(items);
+                })
+                .catch(error => {
+                    console.error('Error loading cart:', error);
+                    showEmptyCart();
+                });
+        }
+        
+        function displayCart(items) {
+            const cartItemsEl = document.getElementById('cartItems');
+            const emptyCartEl = document.getElementById('emptyCart');
+            const cartLayout = document.getElementById('cartLayout');
+            
+            if (!items || items.length === 0) {
+                showEmptyCart();
+                return;
+            }
+            
+            cartLayout.style.display = 'grid';
+            emptyCartEl.style.display = 'none';
+            
+            cartItemsEl.innerHTML = items.map(item => `
+                <div class="cart-item animate-fade-in">
+                    <div class="cart-item-image">
+                        <img src="${item.productImage || 'https://via.placeholder.com/150'}" alt="${item.productName}">
+                    </div>
+                    <div class="cart-item-details">
+                        <h3><a href="product-detail.html?id=${item.productId}">${item.productName}</a></h3>
+                        <div class="cart-item-price">
+                            ${item.discountPrice ? 
+                                `<span class="current-price">$${item.discountPrice.toFixed(2)}</span>
+                                 <span class="original-price">$${item.price.toFixed(2)}</span>` : 
+                                `<span class="current-price">$${item.price.toFixed(2)}</span>`
+                            }
+                        </div>
+                    </div>
+                    <div class="cart-item-quantity">
+                        <button onclick="updateQuantity(${item.id}, ${item.quantity - 1})" ${item.quantity <= 1 ? 'disabled' : ''}>
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <span>${item.quantity}</span>
+                        <button onclick="updateQuantity(${item.id}, ${item.quantity + 1})">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                    <div class="cart-item-total">
+                        $${item.total.toFixed(2)}
+                    </div>
+                    <button class="remove-item" onclick="removeFromCart(${item.id})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `).join('');
+            
+            updateCartSummary(items);
+        }
+        
+        function showEmptyCart() {
+            document.getElementById('cartLayout').style.display = 'none';
+            document.getElementById('emptyCart').style.display = 'block';
+            updateCartSummary([]);
+        }
+        
+        function updateCartSummary(items) {
+            const subtotal = items.reduce((sum, item) => sum + item.total, 0);
+            const tax = subtotal * 0.1;
+            const total = subtotal + tax;
+            
+            document.getElementById('cartSubtotal').textContent = `$${subtotal.toFixed(2)}`;
+            document.getElementById('cartTax').textContent = `$${tax.toFixed(2)}`;
+            document.getElementById('cartTotal').textContent = `$${total.toFixed(2)}`;
+        }
+        
+        function updateQuantity(cartItemId, quantity) {
+            if (quantity < 1) return;
+            
+            fetchAPI(`/api/cart/${cartItemId}?quantity=${quantity}`, 'PUT')
+                .then(() => {
+                    loadCart();
+                    showToast('Cart updated', 'success');
+                })
+                .catch(error => {
+                    console.error('Error updating quantity:', error);
+                    showToast('Error updating quantity', 'error');
+                });
+        }
+        
+        function removeFromCart(cartItemId) {
+            fetchAPI(`/api/cart/${cartItemId}`, 'DELETE')
+                .then(() => {
+                    loadCart();
+                    loadCartCount();
+                    showToast('Item removed from cart', 'success');
+                })
+                .catch(error => {
+                    console.error('Error removing item:', error);
+                    showToast('Error removing item', 'error');
+                });
+        }
+        
+        function proceedToCheckout() {
+            const token = localStorage.getItem('token');
+            
+            if (!token) {
+                showToast('Please login to checkout', 'error');
+                setTimeout(() => window.location.href = 'login.html', 1500);
+                return;
+            }
+            
+            if (!cartItems || cartItems.length === 0) {
+                showToast('Your cart is empty', 'error');
+                return;
+            }
+            
+            window.location.href = 'checkout.html';
+        }
+    </script>
+</body>
+</html>

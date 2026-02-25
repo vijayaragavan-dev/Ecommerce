@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details - ShopLux</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <div class="loading-overlay hidden" id="loadingOverlay">
+        <div class="loader"></div>
+    </div>
+
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <span class="logo-icon"><i class="fas fa-gem"></i></span>
+                <span class="logo-text">ShopLux</span>
+            </a>
+            
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Search products..." id="searchInput">
+                <button class="search-btn" onclick="performSearch()">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+            
+            <div class="nav-icons">
+                <a href="cart.html" class="nav-icon cart-icon">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span class="cart-badge" id="cartBadge">0</span>
+                </a>
+                <div class="user-menu" id="userMenu">
+                    <a href="login.html" class="nav-icon" id="loginBtn">
+                        <i class="fas fa-user"></i>
+                    </a>
+                    <div class="user-dropdown" id="userDropdown" style="display: none;">
+                        <a href="#" id="userNameDisplay"></a>
+                        <a href="admin.html" id="adminLink" style="display: none;">Admin Panel</a>
+                        <a href="#" onclick="logout()">Logout</a>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="index.html" class="mobile-link">Home</a>
+            <a href="products.html" class="mobile-link">Products</a>
+            <a href="cart.html" class="mobile-link">Cart</a>
+            <a href="login.html" class="mobile-link">Login</a>
+        </div>
+    </nav>
+
+    <div class="breadcrumb">
+        <div class="container">
+            <a href="index.html">Home</a>
+            <span>/</span>
+            <a href="products.html">Products</a>
+            <span>/</span>
+            <span id="breadcrumbProduct">Product Details</span>
+        </div>
+    </div>
+
+    <section class="product-detail-page">
+        <div class="container">
+            <div class="product-detail" id="productDetail">
+                <!-- Product loaded dynamically -->
+            </div>
+        </div>
+    </section>
+
+    <section class="related-products">
+        <div class="container">
+            <h2 class="section-title">Related Products</h2>
+            <div class="products-grid" id="relatedProducts">
+                <!-- Related products loaded dynamically -->
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h3>ShopLux</h3>
+                    <p>Your destination for premium products</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="products.html">Products</a></li>
+                        <li><a href="cart.html">Cart</a></li>
+                        <li><a href="login.html">Login</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Categories</h4>
+                    <ul>
+                        <li><a href="products.html?category=Electronics">Electronics</a></li>
+                        <li><a href="products.html?category=Clothing">Clothing</a></li>
+                        <li><a href="products.html?category=Accessories">Accessories</a></li>
+                        <li><a href="products.html?category=Sportswear">Sportswear</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Contact Us</h4>
+                    <ul>
+                        <li><i class="fas fa-envelope"></i> support@shoplux.com</li>
+                        <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Commerce St</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 ShopLux. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="js/loader.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        function hideLoading() { LoadingManager.hide(); }
+        function showLoading() { LoadingManager.show(); }
+        
+        let currentProduct = null;
+        let quantity = 1;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('id');
+            
+            if (productId) {
+                loadProduct(productId);
+            } else {
+                showToast('Product not found', 'error');
+                setTimeout(() => window.location.href = 'products.html', 2000);
+            }
+            
+            updateCartBadge();
+            checkAuth();
+        });
+        
+        function loadProduct(id) {
+            fetchAPI(`/api/products/${id}`, 'GET')
+                .then(product => {
+                    currentProduct = product;
+                    displayProduct(product);
+                    document.getElementById('breadcrumbProduct').textContent = product.name;
+                    document.title = `${product.name} - ShopLux`;
+                    loadRelatedProducts(product.category, product.id);
+                })
+                .catch(error => {
+                    console.error('Error loading product:', error);
+                    showToast('Error loading product', 'error');
+                });
+        }
+        
+        function displayProduct(product) {
+            const container = document.getElementById('productDetail');
+            const discount = product.discountPrice ? Math.round((1 - product.discountPrice / product.price) * 100) : 0;
+            
+            container.innerHTML = `
+                <div class="product-gallery animate-fade-in">
+                    <div class="main-image">
+                        <img src="${product.imageUrl}" alt="${product.name}" id="mainImage">
+                        ${discount > 0 ? `<span class="discount-badge">-${discount}%</span>` : ''}
+                    </div>
+                </div>
+                
+                <div class="product-info animate-fade-in delay-1">
+                    <div class="product-category">${product.category}</div>
+                    <h1 class="product-title">${product.name}</h1>
+                    
+                    <div class="product-rating">
+                        <div class="stars">
+                            ${generateStars(product.rating)}
+                        </div>
+                        <span>${product.rating || 0} (${product.reviewCount || 0} reviews)</span>
+                    </div>
+                    
+                    <div class="product-price">
+                        ${product.discountPrice ? 
+                            `<span class="current-price">$${product.discountPrice.toFixed(2)}</span>
+                             <span class="original-price">$${product.price.toFixed(2)}</span>` : 
+                            `<span class="current-price">$${product.price.toFixed(2)}</span>`
+                        }
+                    </div>
+                    
+                    <p class="product-description">${product.description || 'No description available.'}</p>
+                    
+                    <div class="product-meta">
+                        <div class="meta-item">
+                            <span class="meta-label">Brand:</span>
+                            <span class="meta-value">${product.brand || 'N/A'}</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Category:</span>
+                            <span class="meta-value">${product.category}</span>
+                        </div>
+                        <div class="meta-item">
+                            <span class="meta-label">Availability:</span>
+                            <span class="meta-value ${product.stockQuantity > 0 ? 'in-stock' : 'out-of-stock'}">
+                                ${product.stockQuantity > 0 ? `In Stock (${product.stockQuantity})` : 'Out of Stock'}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="quantity-selector">
+                        <label>Quantity:</label>
+                        <div class="quantity-controls">
+                            <button onclick="decrementQuantity()"><i class="fas fa-minus"></i></button>
+                            <input type="number" id="quantityInput" value="1" min="1" max="${product.stockQuantity}" readonly>
+                            <button onclick="incrementQuantity()"><i class="fas fa-plus"></i></button>
+                        </div>
+                    </div>
+                    
+                    <div class="product-actions">
+                        <button class="btn-primary" onclick="addToCartFromDetail()" ${product.stockQuantity <= 0 ? 'disabled' : ''}>
+                            <i class="fas fa-shopping-bag"></i> Add to Cart
+                        </button>
+                        <button class="btn-secondary" onclick="addToWishlist()">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function generateStars(rating) {
+            const fullStars = Math.floor(rating || 0);
+            const hasHalfStar = (rating || 0) % 1 >= 0.5;
+            let stars = '';
+            
+            for (let i = 0; i < 5; i++) {
+                if (i < fullStars) {
+                    stars += '<i class="fas fa-star"></i>';
+                } else if (i === fullStars && hasHalfStar) {
+                    stars += '<i class="fas fa-star-half-alt"></i>';
+                } else {
+                    stars += '<i class="far fa-star"></i>';
+                }
+            }
+            return stars;
+        }
+        
+        function incrementQuantity() {
+            const input = document.getElementById('quantityInput');
+            const max = parseInt(input.max);
+            if (parseInt(input.value) < max) {
+                input.value = parseInt(input.value) + 1;
+            }
+        }
+        
+        function decrementQuantity() {
+            const input = document.getElementById('quantityInput');
+            if (parseInt(input.value) > 1) {
+                input.value = parseInt(input.value) - 1;
+            }
+        }
+        
+        function addToCartFromDetail() {
+            const qty = parseInt(document.getElementById('quantityInput').value);
+            addToCart(currentProduct.id, qty);
+        }
+        
+        function addToWishlist() {
+            showToast('Added to wishlist', 'success');
+        }
+        
+        function loadRelatedProducts(category, excludeId) {
+            fetchAPI(`/api/products/category/${category}?page=0&size=4`, 'GET')
+                .then(data => {
+                    const products = data.content.filter(p => p.id !== excludeId).slice(0, 4);
+                    const grid = document.getElementById('relatedProducts');
+                    grid.innerHTML = products.map(product => createProductCard(product)).join('');
+                })
+                .catch(error => {
+                    console.error('Error loading related products:', error);
+                });
+        }
+    </script>
+</body>
+</html>

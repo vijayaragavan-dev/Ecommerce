@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products - ShopLux</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <div class="loading-overlay hidden" id="loadingOverlay">
+        <div class="loader"></div>
+    </div>
+
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">
+                <span class="logo-icon"><i class="fas fa-gem"></i></span>
+                <span class="logo-text">ShopLux</span>
+            </a>
+            
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Search products..." id="searchInput" value="">
+                <button class="search-btn" onclick="performSearch()">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+            
+            <div class="nav-icons">
+                <a href="cart.html" class="nav-icon cart-icon">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span class="cart-badge" id="cartBadge">0</span>
+                </a>
+                <div class="user-menu" id="userMenu">
+                    <a href="login.html" class="nav-icon" id="loginBtn">
+                        <i class="fas fa-user"></i>
+                    </a>
+                    <div class="user-dropdown" id="userDropdown" style="display: none;">
+                        <a href="#" id="userNameDisplay"></a>
+                        <a href="admin.html" id="adminLink" style="display: none;">Admin Panel</a>
+                        <a href="#" onclick="logout()">Logout</a>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="index.html" class="mobile-link">Home</a>
+            <a href="products.html?category=Electronics" class="mobile-link">Electronics</a>
+            <a href="products.html?category=Clothing" class="mobile-link">Clothing</a>
+            <a href="products.html?category=Accessories" class="mobile-link">Accessories</a>
+            <a href="products.html?category=Sportswear" class="mobile-link">Sportswear</a>
+            <a href="cart.html" class="mobile-link">Cart</a>
+            <a href="login.html" class="mobile-link" id="mobileLoginLink">Login</a>
+        </div>
+    </nav>
+
+    <div class="page-header">
+        <div class="container">
+            <h1>All Products</h1>
+            <p>Browse our collection of premium products</p>
+        </div>
+    </div>
+
+    <section class="products-page">
+        <div class="container">
+            <div class="products-layout">
+                <aside class="filters-sidebar">
+                    <div class="filter-section">
+                        <h3>Categories</h3>
+                        <ul class="category-list" id="categoryList">
+                            <li><a href="products.html" class="active">All Products</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="filter-section">
+                        <h3>Price Range</h3>
+                        <div class="price-inputs">
+                            <input type="number" id="minPrice" placeholder="Min" min="0">
+                            <span>-</span>
+                            <input type="number" id="maxPrice" placeholder="Max" min="0">
+                        </div>
+                        <button class="filter-btn" onclick="applyPriceFilter()">Apply</button>
+                    </div>
+                    
+                    <div class="filter-section">
+                        <h3>Sort By</h3>
+                        <select id="sortSelect" onchange="applySort()">
+                            <option value="createdAt,desc">Newest First</option>
+                            <option value="price,asc">Price: Low to High</option>
+                            <option value="price,desc">Price: High to Low</option>
+                            <option value="name,asc">Name: A to Z</option>
+                            <option value="name,desc">Name: Z to A</option>
+                        </select>
+                    </div>
+                </aside>
+                
+                <main class="products-main">
+                    <div class="products-header">
+                        <div class="results-count" id="resultsCount">
+                            Showing products
+                        </div>
+                    </div>
+                    
+                    <div class="products-grid" id="productsGrid">
+                        <!-- Products loaded dynamically -->
+                    </div>
+                    
+                    <div class="pagination" id="pagination">
+                        <!-- Pagination loaded dynamically -->
+                    </div>
+                </main>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h3>ShopLux</h3>
+                    <p>Your destination for premium products</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="products.html">Products</a></li>
+                        <li><a href="cart.html">Cart</a></li>
+                        <li><a href="login.html">Login</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Categories</h4>
+                    <ul>
+                        <li><a href="products.html?category=Electronics">Electronics</a></li>
+                        <li><a href="products.html?category=Clothing">Clothing</a></li>
+                        <li><a href="products.html?category=Accessories">Accessories</a></li>
+                        <li><a href="products.html?category=Sportswear">Sportswear</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Contact Us</h4>
+                    <ul>
+                        <li><i class="fas fa-envelope"></i> support@shoplux.com</li>
+                        <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Commerce St</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 ShopLux. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="js/loader.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        function hideLoading() { LoadingManager.hide(); }
+        function showLoading() { LoadingManager.show(); }
+        
+        let currentPage = 0;
+        let currentCategory = null;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCategories();
+            loadProducts();
+            updateCartBadge();
+            checkAuth();
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const category = urlParams.get('category');
+            if (category) {
+                currentCategory = category;
+                document.querySelector('.page-header h1').textContent = category;
+            }
+            
+            const search = urlParams.get('search');
+            if (search) {
+                document.getElementById('searchInput').value = search;
+            }
+        });
+        
+        function loadCategories() {
+            const categories = ['Electronics', 'Clothing', 'Accessories', 'Sportswear'];
+            const list = document.getElementById('categoryList');
+            
+            categories.forEach(cat => {
+                const li = document.createElement('li');
+                li.innerHTML = `<a href="products.html?category=${cat}" class="${currentCategory === cat ? 'active' : ''}">${cat}</a>`;
+                list.appendChild(li);
+            });
+        }
+        
+        function loadProducts(page = 0) {
+            currentPage = page;
+            const sortSelect = document.getElementById('sortSelect');
+            const [sortBy, sortDir] = sortSelect.value.split(',');
+            
+            let url = `/api/products?page=${page}&size=12&sortBy=${sortBy}&sortDir=${sortDir}`;
+            
+            if (currentCategory) {
+                url = `/api/products/category/${currentCategory}?page=${page}&size=12`;
+            }
+            
+            const search = document.getElementById('searchInput').value;
+            if (search) {
+                url = `/api/products/search?q=${encodeURIComponent(search)}&page=${page}&size=12`;
+            }
+            
+            fetchAPI(url, 'GET')
+                .then(data => {
+                    displayProducts(data);
+                    displayPagination(data);
+                })
+                .catch(error => {
+                    console.error('Error loading products:', error);
+                    showToast('Error loading products', 'error');
+                });
+        }
+        
+        function displayProducts(data) {
+            const grid = document.getElementById('productsGrid');
+            const countEl = document.getElementById('resultsCount');
+            
+            if (!data.content || data.content.length === 0) {
+                grid.innerHTML = '<div class="no-products"><p>No products found</p></div>';
+                countEl.textContent = '0 products found';
+                return;
+            }
+            
+            countEl.textContent = `Showing ${data.content.length} of ${data.totalElements} products`;
+            
+            grid.innerHTML = data.content.map(product => createProductCard(product)).join('');
+            
+            grid.querySelectorAll('.product-card').forEach(card => {
+                card.classList.add('animate-in');
+            });
+        }
+        
+        function displayPagination(data) {
+            const pagination = document.getElementById('pagination');
+            
+            if (data.totalPages <= 1) {
+                pagination.innerHTML = '';
+                return;
+            }
+            
+            let html = '';
+            
+            if (data.number > 0) {
+                html += `<button onclick="loadProducts(${data.number - 1})" class="page-btn"><i class="fas fa-chevron-left"></i> Prev</button>`;
+            }
+            
+            for (let i = 0; i < data.totalPages; i++) {
+                if (i === data.number) {
+                    html += `<button class="page-btn active">${i + 1}</button>`;
+                } else if (i <= data.number + 2 && i >= data.number - 2) {
+                    html += `<button onclick="loadProducts(${i})" class="page-btn">${i + 1}</button>`;
+                }
+            }
+            
+            if (data.number < data.totalPages - 1) {
+                html += `<button onclick="loadProducts(${data.number + 1})" class="page-btn">Next <i class="fas fa-chevron-right"></i></button>`;
+            }
+            
+            pagination.innerHTML = html;
+        }
+        
+        function applySort() {
+            loadProducts(0);
+        }
+        
+        function applyPriceFilter() {
+            // Price filtering can be implemented on backend
+            showToast('Price filter applied', 'success');
+        }
+    </script>
+</body>
+</html>
