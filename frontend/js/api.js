@@ -1,4 +1,5 @@
 const API_BASE_URL = 'http://localhost:8080/api';
+const API_TIMEOUT = 15000;
 
 const api = {
     async request(endpoint, method = 'GET', data = null, authenticated = true) {
@@ -22,38 +23,58 @@ const api = {
             config.body = JSON.stringify(data);
         }
         
-        const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
+        config.signal = controller.signal;
         
-        if (!response.ok) {
-            const error = await response.json().catch(() => ({ message: 'An error occurred' }));
-            throw new Error(error.message || 'Request failed');
+        try {
+            const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+            clearTimeout(timeoutId);
+            
+            if (response.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = 'login.html';
+                throw new Error('Session expired. Please login again.');
+            }
+            
+            if (!response.ok) {
+                const error = await response.json().catch(() => ({ message: 'An error occurred' }));
+                throw new Error(error.message || 'Request failed');
+            }
+            
+            if (response.status === 204) {
+                return null;
+            }
+            
+            return response.json();
+        } catch (error) {
+            clearTimeout(timeoutId);
+            if (error.name === 'AbortError') {
+                throw new Error('Request timeout. Please try again.');
+            }
+            throw error;
         }
-        
-        if (response.status === 204) {
-            return null;
-        }
-        
-        return response.json();
     },
     
-    get(endpoint) {
+    async get(endpoint) {
         return this.request(endpoint, 'GET', null, true);
     },
     
-    post(endpoint, data) {
+    async post(endpoint, data) {
         return this.request(endpoint, 'POST', data, true);
     },
     
-    put(endpoint, data) {
+    async put(endpoint, data) {
         return this.request(endpoint, 'PUT', data, true);
     },
     
-    delete(endpoint) {
+    async delete(endpoint) {
         return this.request(endpoint, 'DELETE', null, true);
     }
 };
 
-function fetchAPI(endpoint, method = 'GET', data = null) {
+async function fetchAPI(endpoint, method = 'GET', data = null) {
     const token = localStorage.getItem('token');
     
     const headers = {
@@ -73,40 +94,67 @@ function fetchAPI(endpoint, method = 'GET', data = null) {
         config.body = JSON.stringify(data);
     }
     
-    return fetch(`${API_BASE_URL}${endpoint}`, config)
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(err => {
-                    throw new Error(err.message || 'Request failed');
-                });
-            }
-            
-            if (response.status === 204) {
-                return null;
-            }
-            
-            return response.json();
-        });
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
+    config.signal = controller.signal;
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+        clearTimeout(timeoutId);
+        
+        if (response.status === 401) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+            throw new Error('Session expired. Please login again.');
+        }
+        
+        if (!response.ok) {
+            const err = await response.json().catch(() => ({ message: 'Request failed' }));
+            throw new Error(err.message || 'Request failed');
+        }
+        
+        if (response.status === 204) {
+            return null;
+        }
+        
+        return response.json();
+    } catch (error) {
+        clearTimeout(timeoutId);
+        if (error.name === 'AbortError') {
+            throw new Error('Request timeout. Please try again.');
+        }
+        throw error;
+    }
 }
 
 function showLoading() {
     const overlay = document.getElementById('loadingOverlay');
     if (overlay) {
+        overlay.style.display = 'flex';
         overlay.classList.remove('hidden');
     }
     clearTimeout(loadingTimeout);
     loadingTimeout = setTimeout(() => {
         hideLoading();
-    }, 10000);
+    }, 15000);
 }
 
 function hideLoading() {
     const overlay = document.getElementById('loadingOverlay');
     if (overlay) {
-        overlay.classList.add('hidden');
+        overlay.style.opacity = '0';
+        overlay.style.transition = 'opacity 0.3s ease';
+        setTimeout(() => {
+            overlay.classList.add('hidden');
+            overlay.style.display = 'none';
+            overlay.style.opacity = '1';
+        }, 300);
     }
     clearTimeout(loadingTimeout);
 }
+
+let loadingTimeout;
 
 function showToast(message, type = 'success') {
     const container = document.getElementById('toastContainer');
@@ -118,6 +166,7 @@ function showToast(message, type = 'success') {
     let icon = 'check-circle';
     if (type === 'error') icon = 'exclamation-circle';
     if (type === 'warning') icon = 'exclamation-triangle';
+    if (type === 'info') icon = 'info-circle';
     
     toast.innerHTML = `
         <i class="fas fa-${icon}"></i>
@@ -126,10 +175,14 @@ function showToast(message, type = 'success') {
     
     container.appendChild(toast);
     
+    requestAnimationFrame(() => {
+        toast.style.animation = 'slideIn 0.3s ease forwards';
+    });
+    
     setTimeout(() => {
         toast.style.animation = 'slideIn 0.3s ease reverse';
         setTimeout(() => toast.remove(), 300);
-    }, 3000);
+    }, 4000);
 }
 
 function createProductCard(product) {

@@ -1,6 +1,6 @@
 # ShopLux E-Commerce Application
 
-A full-stack e-commerce website built with Spring Boot (Java) backend and vanilla HTML/CSS/JS frontend with MySQL database.
+A production-ready full-stack e-commerce website built with Spring Boot (Java) backend and vanilla HTML/CSS/JS frontend with MySQL database.
 
 ## Project Structure
 
@@ -33,6 +33,7 @@ ecommerce/
 │   ├── login.html           # Login/Register
 │   ├── checkout.html        # Checkout
 │   └── admin.html           # Admin panel
+├── .gitignore
 └── README.md
 ```
 
@@ -53,16 +54,12 @@ ecommerce/
 Download and install MySQL from: https://dev.mysql.com/downloads/mysql/
 
 ### 2. Create Database
-The application will automatically create the database. 
-However, you can create it manually:
-
 ```sql
 CREATE DATABASE ecommerce CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
 ### 3. Configure MySQL Password
 Update `backend/src/main/resources/application.properties`:
-
 ```properties
 spring.datasource.password=YOUR_PASSWORD_HERE
 ```
@@ -74,19 +71,24 @@ spring.datasource.password=YOUR_PASSWORD_HERE
 cd backend
 ```
 
-### 2. Build the Project
+### 2. Update Configuration
+Edit `src/main/resources/application.properties`:
+- Set your MySQL password
+- Generate a secure JWT secret (minimum 256 bits)
+
+### 3. Build the Project
 ```bash
 mvn clean install -DskipTests
 ```
 
-### 3. Run the Application
+### 4. Run the Application
 ```bash
 mvn spring-boot:run
 ```
 
 The backend will start on: http://localhost:8080
 
-### 4. Default Credentials (Auto-created)
+### 5. Default Credentials (Auto-created)
 - **Admin**: admin@ecommerce.com / admin123
 - **User**: user@ecommerce.com / user123
 
@@ -147,53 +149,59 @@ The frontend will be available at: http://localhost:5500
 ## Features
 
 ### Frontend Features:
-- ✅ Hero slider with animations
-- ✅ Product grid with filtering/sorting
-- ✅ Search functionality
-- ✅ Shopping cart
-- ✅ User authentication
-- ✅ Checkout process
-- ✅ Admin panel for product/order management
-- ✅ Responsive design
-- ✅ Toast notifications
-- ✅ Loading animations
+- Hero slider with animations
+- Product grid with filtering/sorting
+- Search functionality
+- Shopping cart
+- User authentication (JWT)
+- Checkout process
+- Admin panel for product/order management
+- Fully responsive design
+- Toast notifications
+- Loading animations
+- Smooth scroll animations
 
 ### Backend Features:
-- ✅ JWT authentication
-- ✅ RESTful API
-- ✅ MySQL database integration
-- ✅ Product CRUD operations
-- ✅ Cart management
-- ✅ Order management
-- ✅ Admin role management
-- ✅ Auto-seed data
+- JWT authentication with expiration
+- RESTful API
+- MySQL database integration
+- Product CRUD operations
+- Cart management
+- Order management
+- Admin role management
+- Auto-seed data with sample products
 
-## Environment Variables
+## Production Deployment
 
-You can customize settings in `application.properties`:
-
+### Backend Configuration
+For production, update `application.properties`:
 ```properties
-# Server
-server.port=8080
+# Use strong JWT secret (generate a secure random string)
+jwt.secret=YOUR_VERY_LONG_SECURE_RANDOM_STRING
 
-# Database
-spring.datasource.url=jdbc:mysql://localhost:3306/ecommerce
-spring.datasource.username=root
-spring.datasource.password=YOUR_PASSWORD_HERE
-
-# JWT
-jwt.secret=YOUR_JWT_SECRET_HERE
-jwt.expiration=86400000
-
-# CORS
-cors.allowed-origins=http://localhost:5500,http://127.0.0.1:5500
+# Disable debug logging
+spring.jpa.show-sql=false
+logging.level.com.ecommerce=INFO
 ```
+
+### Frontend Configuration
+Update `js/api.js` for production:
+```javascript
+const API_BASE_URL = 'https://your-api-domain.com/api';
+```
+
+### Security Notes
+- Never commit real passwords or secrets to version control
+- Use environment variables in production
+- Generate strong JWT secrets
+- Enable HTTPS in production
+- Configure proper CORS origins
 
 ## Troubleshooting
 
 ### MySQL Connection Issues:
 1. Ensure MySQL is running
-2. Check username/password
+2. Check username/password in application.properties
 3. Verify database exists
 
 ### Frontend Not Loading:

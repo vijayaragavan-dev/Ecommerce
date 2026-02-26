@@ -3,11 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Browse our collection of premium products - Electronics, Clothing, Accessories and more">
+    <meta name="keywords" content="products, electronics, clothing, accessories, shop">
+    <meta name="theme-color" content="#667eea">
+    <meta property="og:title" content="All Products - ShopLux">
+    <meta property="og:description" content="Browse our premium product collection">
+    <meta property="og:type" content="website">
     <title>Products - ShopLux</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💎</text></svg>">
     <link rel="stylesheet" href="css/styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
@@ -15,52 +22,75 @@
         <div class="loader"></div>
     </div>
 
+    <!-- Premium Apple-Style Navbar -->
     <nav class="navbar" id="navbar">
-        <div class="nav-container">
-            <a href="index.html" class="logo">
-                <span class="logo-icon"><i class="fas fa-gem"></i></span>
-                <span class="logo-text">ShopLux</span>
-            </a>
-            
-            <div class="search-container">
-                <input type="text" class="search-input" placeholder="Search products..." id="searchInput" value="">
-                <button class="search-btn" onclick="performSearch()">
-                    <i class="fas fa-search"></i>
-                </button>
+        <div class="nav-wrapper">
+            <div class="nav-logo" onclick="window.location.href='index.html'">
+                <div class="nav-logo-icon"><i class="fas fa-gem"></i></div>
+                <span class="nav-logo-text">ShopLux</span>
             </div>
             
-            <div class="nav-icons">
-                <a href="cart.html" class="nav-icon cart-icon">
-                    <i class="fas fa-shopping-bag"></i>
-                    <span class="cart-badge" id="cartBadge">0</span>
-                </a>
-                <div class="user-menu" id="userMenu">
-                    <a href="login.html" class="nav-icon" id="loginBtn">
-                        <i class="fas fa-user"></i>
-                    </a>
-                    <div class="user-dropdown" id="userDropdown" style="display: none;">
-                        <a href="#" id="userNameDisplay"></a>
-                        <a href="admin.html" id="adminLink" style="display: none;">Admin Panel</a>
-                        <a href="#" onclick="logout()">Logout</a>
-                    </div>
+            <div class="nav-menu">
+                <a href="index.html">Home</a>
+                <a href="products.html?category=Electronics">Electronics</a>
+                <a href="products.html?category=Clothing">Clothing</a>
+                <a href="products.html?category=Accessories">Accessories</a>
+                <a href="products.html?category=Sportswear">Sportswear</a>
+            </div>
+            
+            <div class="nav-search-wrapper">
+                <div class="nav-search">
+                    <i class="fas fa-search nav-search-icon"></i>
+                    <input type="text" class="nav-search-input" placeholder="Search products..." id="searchInput" onkeypress="if(event.key==='Enter')performSearch()">
+                    <button class="nav-search-btn" onclick="performSearch()"><i class="fas fa-arrow-right"></i></button>
                 </div>
             </div>
             
-            <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
-                <i class="fas fa-bars"></i>
-            </button>
-        </div>
-        
-        <div class="mobile-menu" id="mobileMenu">
-            <a href="index.html" class="mobile-link">Home</a>
-            <a href="products.html?category=Electronics" class="mobile-link">Electronics</a>
-            <a href="products.html?category=Clothing" class="mobile-link">Clothing</a>
-            <a href="products.html?category=Accessories" class="mobile-link">Accessories</a>
-            <a href="products.html?category=Sportswear" class="mobile-link">Sportswear</a>
-            <a href="cart.html" class="mobile-link">Cart</a>
-            <a href="login.html" class="mobile-link" id="mobileLoginLink">Login</a>
+            <div class="nav-actions">
+                <a href="cart.html" class="nav-icon-btn">
+                    <i class="fas fa-shopping-bag"></i>
+                    <span class="cart-badge" id="cartBadge">0</span>
+                </a>
+                
+                <div class="nav-user-wrapper" id="userWrapper" style="display: none;">
+                    <div class="nav-user-btn">
+                        <div class="nav-user-avatar" id="userAvatar">U</div>
+                        <span class="nav-user-name" id="userNameDisplay"></span>
+                    </div>
+                    <div class="nav-user-dropdown">
+                        <div class="nav-dropdown-item" id="userDropdownName"></div>
+                        <div class="nav-dropdown-divider"></div>
+                        <div class="nav-dropdown-item" onclick="window.location.href='admin.html'" id="adminLinkItem" style="display: none;"><i class="fas fa-cog"></i><span>Admin Panel</span></div>
+                        <div class="nav-dropdown-item" onclick="logout()"><i class="fas fa-sign-out-alt"></i><span>Logout</span></div>
+                    </div>
+                </div>
+                
+                <div class="nav-login-btn" id="loginBtnWrapper" onclick="window.location.href='login.html'">
+                    <i class="fas fa-user"></i>
+                    <span>Sign In</span>
+                </div>
+                
+                <div class="nav-hamburger" onclick="toggleMobileMenu()">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                </div>
+            </div>
         </div>
     </nav>
+    
+    <div class="nav-mobile" id="mobileMenu">
+        <div class="nav-mobile-search">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Search products..." id="mobileSearchInput">
+        </div>
+        <a href="index.html" class="nav-mobile-link"><span>Home</span><i class="fas fa-chevron-right"></i></a>
+        <a href="products.html?category=Electronics" class="nav-mobile-link"><span>Electronics</span><i class="fas fa-chevron-right"></i></a>
+        <a href="products.html?category=Clothing" class="nav-mobile-link"><span>Clothing</span><i class="fas fa-chevron-right"></i></a>
+        <a href="products.html?category=Accessories" class="nav-mobile-link"><span>Accessories</span><i class="fas fa-chevron-right"></i></a>
+        <a href="products.html?category=Sportswear" class="nav-mobile-link"><span>Sportswear</span><i class="fas fa-chevron-right"></i></a>
+        <a href="cart.html" class="nav-mobile-link"><span>Cart</span><i class="fas fa-chevron-right"></i></a>
+    </div>
 
     <div class="page-header">
         <div class="container">
@@ -210,6 +240,12 @@
         }
         
         function loadProducts(page = 0) {
+            const grid = document.getElementById('productsGrid');
+            const countEl = document.getElementById('resultsCount');
+            
+            grid.innerHTML = '<div class="loading-products"><div class="loader"></div><p>Loading products...</p></div>';
+            countEl.textContent = 'Loading...';
+            
             currentPage = page;
             const sortSelect = document.getElementById('sortSelect');
             const [sortBy, sortDir] = sortSelect.value.split(',');
@@ -217,13 +253,15 @@
             let url = `/api/products?page=${page}&size=12&sortBy=${sortBy}&sortDir=${sortDir}`;
             
             if (currentCategory) {
-                url = `/api/products/category/${currentCategory}?page=${page}&size=12`;
+                url = `/api/products/category/${currentCategory}?page=${page}&size=12&sortBy=createdAt&sortDir=desc`;
             }
             
             const search = document.getElementById('searchInput').value;
             if (search) {
                 url = `/api/products/search?q=${encodeURIComponent(search)}&page=${page}&size=12`;
             }
+            
+            showLoading();
             
             fetchAPI(url, 'GET')
                 .then(data => {
@@ -232,17 +270,30 @@
                 })
                 .catch(error => {
                     console.error('Error loading products:', error);
-                    showToast('Error loading products', 'error');
-                });
+                    grid.innerHTML = `<div class="no-products">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>Unable to Load Products</h3>
+                        <p>${error.message || 'Please make sure the backend is running on port 8080'}</p>
+                        <button class="btn-primary" onclick="loadProducts(0)">Try Again</button>
+                    </div>`;
+                    countEl.textContent = 'Error loading products';
+                    showToast('Failed to load products', 'error');
+                })
+                .finally(() => hideLoading());
         }
         
         function displayProducts(data) {
             const grid = document.getElementById('productsGrid');
             const countEl = document.getElementById('resultsCount');
             
-            if (!data.content || data.content.length === 0) {
-                grid.innerHTML = '<div class="no-products"><p>No products found</p></div>';
+            if (!data || !data.content || data.content.length === 0) {
+                grid.innerHTML = `<div class="no-products">
+                    <i class="fas fa-box-open"></i>
+                    <h3>No Products Found</h3>
+                    <p>Try adjusting your filters or search terms</p>
+                </div>`;
                 countEl.textContent = '0 products found';
+                document.getElementById('pagination').innerHTML = '';
                 return;
             }
             
@@ -250,8 +301,10 @@
             
             grid.innerHTML = data.content.map(product => createProductCard(product)).join('');
             
-            grid.querySelectorAll('.product-card').forEach(card => {
-                card.classList.add('animate-in');
+            grid.querySelectorAll('.product-card').forEach((card, index) => {
+                setTimeout(() => {
+                    card.classList.add('animate-in');
+                }, index * 50);
             });
         }
         

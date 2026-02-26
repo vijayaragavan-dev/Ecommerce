@@ -55,58 +55,68 @@ function prevSlide() {
 }
 
 function loadFeaturedProducts() {
+    const grid = document.getElementById('featuredProducts');
+    if (!grid) return;
+    
+    grid.innerHTML = '<div class="loading-products"><div class="loader"></div></div>';
+    
     fetchAPI('/api/products/featured', 'GET')
         .then(products => {
-            const grid = document.getElementById('featuredProducts');
-            if (!grid) return;
-            
             if (!products || products.length === 0) {
-                // Use sample data if API returns empty
                 grid.innerHTML = SAMPLE_PRODUCTS.slice(0, 4).map(product => createProductCard(product)).join('');
                 return;
             }
             
-            grid.innerHTML = products.slice(0, 4).map(product => createProductCard(product)).join('');
+            grid.innerHTML = products.slice(0, 4).map((product, index) => {
+                const card = createProductCard(product);
+                setTimeout(() => {
+                    const cardElement = grid.children[index];
+                    if (cardElement) cardElement.classList.add('animate-in');
+                }, index * 100);
+                return card;
+            }).join('');
         })
         .catch(error => {
             console.log('Using sample products (backend unavailable):', error.message);
-            const grid = document.getElementById('featuredProducts');
-            if (grid) {
-                // Show sample products when backend is down
-                grid.innerHTML = SAMPLE_PRODUCTS.slice(0, 4).map(product => createProductCard(product)).join('');
-            }
-            hideLoading();
-        });
+            grid.innerHTML = SAMPLE_PRODUCTS.slice(0, 4).map(product => createProductCard(product)).join('');
+        })
+        .finally(() => hideLoading());
 }
 
 function loadBestsellers() {
-    fetchAPI('/api/products?page=0&size=4&sortBy=rating&desc', 'GET')
+    const grid = document.getElementById('bestsellersGrid');
+    if (!grid) return;
+    
+    grid.innerHTML = '<div class="loading-products"><div class="loader"></div></div>';
+    
+    fetchAPI('/api/products?page=0&size=4&sortBy=rating&sortDir=desc', 'GET')
         .then(data => {
-            const grid = document.getElementById('bestsellersGrid');
-            if (!grid) return;
-            
-            if (!data.content || data.content.length === 0) {
+            if (!data || !data.content || data.content.length === 0) {
                 grid.innerHTML = SAMPLE_PRODUCTS.slice(4, 8).map(product => createProductCard(product)).join('');
                 return;
             }
             
-            grid.innerHTML = data.content.map(product => createProductCard(product)).join('');
+            grid.innerHTML = data.content.map((product, index) => {
+                const card = createProductCard(product);
+                setTimeout(() => {
+                    const cardElement = grid.children[index];
+                    if (cardElement) cardElement.classList.add('animate-in');
+                }, index * 100);
+                return card;
+            }).join('');
         })
         .catch(error => {
             console.log('Using sample products (backend unavailable):', error.message);
-            const grid = document.getElementById('bestsellersGrid');
-            if (grid) {
-                grid.innerHTML = SAMPLE_PRODUCTS.slice(4, 8).map(product => createProductCard(product)).join('');
-            }
-            hideLoading();
-        });
+            grid.innerHTML = SAMPLE_PRODUCTS.slice(4, 8).map(product => createProductCard(product)).join('');
+        })
+        .finally(() => hideLoading());
 }
 
 function addToCart(productId, quantity = 1) {
     const token = localStorage.getItem('token');
     
     if (!token) {
-        showToast('Please login to add items to cart', 'error');
+        showToast('Please login to add items to cart', 'warning');
         setTimeout(() => window.location.href = 'login.html', 1500);
         return;
     }
@@ -139,7 +149,14 @@ function loadCartCount() {
     fetchAPI('/api/cart/count', 'GET')
         .then(data => {
             if (data && data.count !== undefined) {
-                badge.textContent = data.count;
+                const newCount = data.count;
+                const currentCount = parseInt(badge.textContent) || 0;
+                badge.textContent = newCount;
+                
+                if (newCount > currentCount && currentCount > 0) {
+                    badge.classList.add('pulse');
+                    setTimeout(() => badge.classList.remove('pulse'), 300);
+                }
             }
         })
         .catch(error => {
@@ -156,34 +173,54 @@ function checkAuth() {
     const token = localStorage.getItem('token');
     const userData = localStorage.getItem('user');
     
-    const loginBtn = document.getElementById('loginBtn');
-    const userDropdown = document.getElementById('userDropdown');
+    const loginBtnWrapper = document.getElementById('loginBtnWrapper');
+    const userWrapper = document.getElementById('userWrapper');
     const userNameDisplay = document.getElementById('userNameDisplay');
-    const adminLink = document.getElementById('adminLink');
+    const userDropdownName = document.getElementById('userDropdownName');
+    const adminLinkItem = document.getElementById('adminLinkItem');
+    const userAvatar = document.getElementById('userAvatar');
     const mobileLoginLink = document.getElementById('mobileLoginLink');
+    const mobileAccountLink = document.getElementById('mobileAccountLink');
+    const mobileAdminLink = document.getElementById('mobileAdminLink');
+    const mobileLogoutLink = document.getElementById('mobileLogoutLink');
     
     if (token && userData) {
-        const user = JSON.parse(userData);
-        
-        if (loginBtn) loginBtn.style.display = 'none';
-        if (userDropdown) userDropdown.style.display = 'block';
-        if (userNameDisplay) userNameDisplay.textContent = `${user.firstName} ${user.lastName}`;
-        
-        if (user.role === 'ADMIN') {
-            if (adminLink) adminLink.style.display = 'block';
-        } else {
-            if (adminLink) adminLink.style.display = 'none';
+        try {
+            const user = JSON.parse(userData);
+            
+            if (loginBtnWrapper) loginBtnWrapper.style.display = 'none';
+            if (userWrapper) userWrapper.style.display = 'block';
+            if (userNameDisplay) userNameDisplay.textContent = `${user.firstName}`;
+            if (userDropdownName) userDropdownName.textContent = `${user.firstName} ${user.lastName}`;
+            if (userAvatar) userAvatar.textContent = user.firstName ? user.firstName.charAt(0).toUpperCase() : 'U';
+            
+            if (user.role === 'ADMIN') {
+                if (adminLinkItem) adminLinkItem.style.display = 'flex';
+                if (mobileAdminLink) mobileAdminLink.style.display = 'block';
+            } else {
+                if (adminLinkItem) adminLinkItem.style.display = 'none';
+                if (mobileAdminLink) mobileAdminLink.style.display = 'none';
+            }
+            
+            if (mobileLoginLink) mobileLoginLink.parentElement.style.display = 'none';
+            if (mobileAccountLink) mobileAccountLink.style.display = 'block';
+            if (mobileLogoutLink) mobileLogoutLink.style.display = 'block';
+        } catch (e) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            if (loginBtnWrapper) loginBtnWrapper.style.display = 'flex';
+            if (userWrapper) userWrapper.style.display = 'none';
+            if (adminLinkItem) adminLinkItem.style.display = 'none';
         }
-        
-        if (mobileLoginLink) mobileLoginLink.parentElement.style.display = 'none';
     } else {
-        if (loginBtn) loginBtn.style.display = 'flex';
-        if (userDropdown) userDropdown.style.display = 'none';
-        if (adminLink) adminLink.style.display = 'none';
+        if (loginBtnWrapper) loginBtnWrapper.style.display = 'flex';
+        if (userWrapper) userWrapper.style.display = 'none';
+        if (adminLinkItem) adminLinkItem.style.display = 'none';
         
-        if (mobileLoginLink) {
-            mobileLoginLink.parentElement.style.display = 'block';
-        }
+        if (mobileLoginLink) mobileLoginLink.parentElement.style.display = 'block';
+        if (mobileAccountLink) mobileAccountLink.style.display = 'none';
+        if (mobileAdminLink) mobileAdminLink.style.display = 'none';
+        if (mobileLogoutLink) mobileLogoutLink.style.display = 'none';
     }
 }
 
@@ -205,9 +242,28 @@ function performSearch() {
 
 function toggleMobileMenu() {
     const mobileMenu = document.getElementById('mobileMenu');
+    const hamburger = document.querySelector('.nav-hamburger');
+    const body = document.body;
+    
     if (mobileMenu) {
         mobileMenu.classList.toggle('active');
     }
+    if (hamburger) {
+        hamburger.classList.toggle('active');
+    }
+    if (body) {
+        body.style.overflow = mobileMenu?.classList.contains('active') ? 'hidden' : '';
+    }
+}
+
+function closeMobileMenu() {
+    const mobileMenu = document.getElementById('mobileMenu');
+    const hamburger = document.querySelector('.nav-hamburger');
+    const body = document.body;
+    
+    if (mobileMenu) mobileMenu.classList.remove('active');
+    if (hamburger) hamburger.classList.remove('active');
+    if (body) body.style.overflow = '';
 }
 
 window.addEventListener('scroll', function() {
@@ -228,6 +284,18 @@ document.addEventListener('DOMContentLoaded', function() {
         searchInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 performSearch();
+            }
+        });
+    }
+    
+    const mobileSearchInput = document.getElementById('mobileSearchInput');
+    if (mobileSearchInput) {
+        mobileSearchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const query = mobileSearchInput.value.trim();
+                if (query) {
+                    window.location.href = `products.html?search=${encodeURIComponent(query)}`;
+                }
             }
         });
     }
